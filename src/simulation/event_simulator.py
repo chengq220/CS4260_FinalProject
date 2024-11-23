@@ -1,5 +1,7 @@
 import json
 import os
+
+# Event pattern to use from the configuration file
 pattern = "patterns1"
 
 class EventSimulator:
