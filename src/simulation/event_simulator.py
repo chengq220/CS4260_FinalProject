@@ -1,5 +1,6 @@
 import json
 import os
+pattern = "patterns1"
 
 class EventSimulator:
     def __init__(self, grid_size, config_path):
@@ -16,7 +17,7 @@ class EventSimulator:
         # Load event patterns from the configuration file
         config_path = os.path.join(os.path.dirname(__file__), "../configs", os.path.basename(config_path))
         with open(config_path, 'r') as file:
-            self.event_patterns = json.load(file).get("patterns", [])
+            self.event_patterns = json.load(file).get(pattern, [])
 
     def get_current_pattern(self, current_time):
         """

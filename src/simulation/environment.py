@@ -20,6 +20,7 @@ YELLOW = (255, 255, 0)
 PURPLE = (128, 0, 128)
 ORANGE = (255, 165, 0)
 
+pick_up_drop_offs = "deliveries1"
 
 class Environment:
     def __init__(self, time_step=10, config_path="pick_up_drop_off_config.json"):
@@ -56,7 +57,7 @@ class Environment:
 
     def load_deliveries_from_config(self, config_path):
         with open(config_path, 'r') as file:
-            return json.load(file)["deliveries"]
+            return json.load(file)[pick_up_drop_offs]
 
     def reset(self):
         self.grid = [[0 for _ in range(GRID_SIZE)] for _ in range(GRID_SIZE)]
