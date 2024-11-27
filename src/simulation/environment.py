@@ -12,19 +12,64 @@ class Environment:
         self.time_step = time_step
         self.obstacles = {}
         self.no_fly_zones = {}
-        self.event_simulator = None  # Add reference for event simulator
+        self.future_obstacles = {}
+        self.future_no_fly_zones = {}
+        self.event_simulator = None
+        self.locations_manager = None
         self.reset()
 
     def set_event_simulator(self, event_simulator):
         """Set the event simulator reference."""
         self.event_simulator = event_simulator
 
+    def set_locations_manager(self, locations_manager):
+        """Set the locations manager reference."""
+        self.locations_manager = locations_manager
+
     def update_dynamic_events(self):
-        """Synchronize obstacles and no-fly zones with event simulator."""
+        """Synchronize current and future event zones with the event simulator."""
         if self.event_simulator:
             self.event_simulator.update_events(self.current_time)
-            self.obstacles = {tuple(pos): "obstacle" for pos in self.event_simulator.get_obstacles()}
-            self.no_fly_zones = {tuple(pos): "no-fly-zone" for pos in self.event_simulator.get_no_fly_zones()}
+
+            # Get pickup and dropoff points
+            pick_up_points = self.grid_with_priority("pickup")
+            drop_off_points = self.grid_with_priority("dropoff")
+
+            # Merge event zones while giving priority to pickup/dropoff
+            self.obstacles = {
+                tuple(pos): "obstacle"
+                for pos in self.event_simulator.get_obstacles()
+                if tuple(pos) not in pick_up_points and tuple(pos) not in drop_off_points
+            }
+
+            self.no_fly_zones = {
+                tuple(pos): "no-fly-zone"
+                for pos in self.event_simulator.get_no_fly_zones()
+                if tuple(pos) not in pick_up_points and tuple(pos) not in drop_off_points
+            }
+
+            self.future_obstacles = {
+                tuple(pos): "future-obstacle"
+                for pos in self.event_simulator.get_future_obstacles()
+                if tuple(pos) not in pick_up_points and tuple(pos) not in drop_off_points
+            }
+
+            self.future_no_fly_zones = {
+                tuple(pos): "future-no-fly-zone"
+                for pos in self.event_simulator.get_future_no_fly_zones()
+                if tuple(pos) not in pick_up_points and tuple(pos) not in drop_off_points
+            }
+
+    def grid_with_priority(self, point_type):
+        """Retrieve grid points based on priority."""
+        if not self.locations_manager:
+            return {}
+
+        if point_type == "pickup":
+            return set(self.locations_manager.get_pick_up_points().keys())
+        elif point_type == "dropoff":
+            return set(self.locations_manager.get_drop_off_points().keys())
+        return {}
 
     def reset(self):
         """Reset the environment state."""

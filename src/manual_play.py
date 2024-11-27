@@ -1,7 +1,9 @@
 import pygame
 from agent.agent import Agent
+from src.agent.input_handler import InputHandler
 
 pygame.init()
+
 # Constants
 WINDOW_SIZE = 600
 GRID_SIZE = 20
@@ -23,33 +25,23 @@ COLORS = {
 
 class ManualPlay:
     def __init__(self):
-        """Initialize the agent for manual play."""
+        """Initialize the manual play environment."""
         self.agent = Agent(grid_size=GRID_SIZE, cell_size=CELL_SIZE, colors=COLORS)
+        self.input_handler = InputHandler(agent=self.agent)
         self.clock = pygame.time.Clock()
 
-    def handle_input(self, event):
-        """Handle keyboard input to manually control the drone."""
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                self.agent.perform_action("UP")
-            elif event.key == pygame.K_DOWN:
-                self.agent.perform_action("DOWN")
-            elif event.key == pygame.K_LEFT:
-                self.agent.perform_action("LEFT")
-            elif event.key == pygame.K_RIGHT:
-                self.agent.perform_action("RIGHT")
-
-    def run(self):
-        """Main loop for manual play."""
+    def run(self, mode="manual", agent_action=None):
+        """
+        Main loop for playing or simulating the environment.
+        Args:
+            mode: The input mode ("manual" for user input, "agent" for automated input).
+            agent_action: The agent's next action, used in "agent" mode.
+        """
         self.agent.reset()
         running = True
 
         while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                self.handle_input(event)
-
+            running = self.input_handler.get_next_action(mode=mode, agent_action=agent_action)
             self.agent.render_environment()
 
             if self.agent.check_completion():
@@ -63,4 +55,4 @@ class ManualPlay:
 
 if __name__ == "__main__":
     game = ManualPlay()
-    game.run()
+    game.run(mode="manual")  # Use mode="agent" and provide `agent_action` for automated play

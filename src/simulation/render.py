@@ -21,12 +21,22 @@ class Renderer:
                 rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
                 pygame.draw.rect(self.window, self.colors["GRAY"], rect, 1)
 
-        # Draw obstacles
+        # Draw future obstacles
+        for fut_obs in environment.future_obstacles:
+            rect = pygame.Rect(fut_obs[0] * self.cell_size, fut_obs[1] * self.cell_size, self.cell_size, self.cell_size)
+            pygame.draw.rect(self.window, self.colors.get("LIGHT_RED", (255, 200, 200)), rect)
+
+        # Draw future no-fly zones
+        for fut_no_fly in environment.future_no_fly_zones:
+            rect = pygame.Rect(fut_no_fly[0] * self.cell_size, fut_no_fly[1] * self.cell_size, self.cell_size, self.cell_size)
+            pygame.draw.rect(self.window, self.colors.get("LIGHT_YELLOW", (255, 255, 150)), rect)
+
+        # Draw current obstacles
         for obs in environment.obstacles:
             rect = pygame.Rect(obs[0] * self.cell_size, obs[1] * self.cell_size, self.cell_size, self.cell_size)
             pygame.draw.rect(self.window, self.colors["RED"], rect)
 
-        # Draw no-fly zones
+        # Draw current no-fly zones
         for no_fly in environment.no_fly_zones:
             rect = pygame.Rect(no_fly[0] * self.cell_size, no_fly[1] * self.cell_size, self.cell_size, self.cell_size)
             pygame.draw.rect(self.window, self.colors["YELLOW"], rect)

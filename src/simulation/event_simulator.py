@@ -13,13 +13,25 @@ class EventSimulator:
             config_path (str): Path to the event patterns configuration file.
         """
         self.grid_size = grid_size
-        self.obstacles = []  # List of obstacle coordinates
-        self.no_fly_zones = []  # List of no-fly zone coordinates
+        self.obstacles = []
+        self.no_fly_zones = []
+        self.future_obstacles = []
+        self.future_no_fly_zones = []
 
-        # Load event patterns from the configuration file
+        # Load event patterns
         config_path = os.path.join(os.path.dirname(__file__), "../configs", os.path.basename(config_path))
         with open(config_path, 'r') as file:
             self.event_patterns = json.load(file).get(pattern, [])
+
+    def get_next_pattern(self, current_time):
+        """
+        Get the next obstacle and no-fly zone pattern for the time after the current period.
+        """
+        for i, pattern in enumerate(self.event_patterns):
+            start, end = pattern.get("time_range", (0, 0))
+            if start <= current_time < end:
+                return self.event_patterns[i + 1] if i + 1 < len(self.event_patterns) else {}
+        return {}
 
     def get_current_pattern(self, current_time):
         """
@@ -52,13 +64,16 @@ class EventSimulator:
 
     def update_events(self, current_time):
         """
-        Update the obstacles and no-fly zones based on the current time.
-        Args:
-            current_time (int): The current time in the simulation (in minutes).
+        Update current and future obstacles/no-fly zones based on time.
         """
-        pattern = self.get_current_pattern(current_time)
-        self.obstacles = pattern.get("obstacles", [])
-        self.no_fly_zones = pattern.get("no_fly_zones", [])
+        current_pattern = self.get_current_pattern(current_time)
+        next_pattern = self.get_next_pattern(current_time)
+
+        self.obstacles = current_pattern.get("obstacles", [])
+        self.no_fly_zones = current_pattern.get("no_fly_zones", [])
+
+        self.future_obstacles = next_pattern.get("obstacles", [])
+        self.future_no_fly_zones = next_pattern.get("no_fly_zones", [])
 
     def get_obstacles(self):
         """
@@ -75,3 +90,11 @@ class EventSimulator:
             list: A list of (x, y) tuples representing no-fly zone coordinates.
         """
         return self.no_fly_zones
+
+    def get_future_obstacles(self):
+        """Returns the list of future obstacle coordinates."""
+        return self.future_obstacles
+
+    def get_future_no_fly_zones(self):
+        """Returns the list of future no-fly zone coordinates."""
+        return self.future_no_fly_zones

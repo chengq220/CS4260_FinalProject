@@ -14,10 +14,12 @@ class Agent:
         self.locations_manager = LocationsManager(config_path="src/configs/pick_up_drop_off_config.json")
         self.reward_function = RewardFunction()
 
-        # Set event simulator in environment
+        # Set event simulator and locations manager in environment
         self.environment.set_event_simulator(self.event_simulator)
+        self.environment.set_locations_manager(self.locations_manager)
 
         self.reset()
+
 
     def reset(self):
         """Reset the agent and dependencies."""
@@ -62,27 +64,25 @@ class Agent:
         action_result = {"type": "move", "success": True, "target": None}
         grid_size = self.environment.grid_size
 
-        # Ensure that new position is within grid bounds
+        # Ensure the new position is within grid bounds
         if 0 <= new_pos[0] < grid_size and 0 <= new_pos[1] < grid_size:
-            # Update drone position since we allow it to move into any cell within bounds
-            self.environment.drone_pos = new_pos
-
-            # Check for event zones or special tiles
-            if new_pos in self.environment.obstacles:
-                # Obstacle encountered
-                action_result.update({"type": "obstacle", "success": True, "target": "obstacle"})
-            elif new_pos in self.environment.no_fly_zones:
-                # No-fly zone encountered
-                action_result.update({"type": "no-fly-zone", "success": True, "target": "no-fly-zone"})
-            elif new_pos in self.locations_manager.get_pick_up_points():
-                # Handle a valid pickup
+            # Check for pickup or dropoff first, as they take priority
+            if new_pos in self.locations_manager.get_pick_up_points():
                 self._handle_pickup(new_pos, action_result)
             elif new_pos in self.locations_manager.get_drop_off_points():
-                # Handle a valid drop-off
                 self._handle_dropoff(new_pos, action_result)
+            elif new_pos in self.environment.obstacles:
+                # Handle obstacle
+                self._handle_event_zone(new_pos, "obstacle", action_result)
+            elif new_pos in self.environment.no_fly_zones:
+                # Handle no-fly zone
+                self._handle_event_zone(new_pos, "no-fly-zone", action_result)
             else:
                 # Valid move to a neutral tile
                 action_result.update({"type": "move", "success": True, "target": None})
+
+            # Update the drone's position
+            self.environment.drone_pos = new_pos
         else:
             # Out-of-bounds move attempted
             action_result.update({"type": "move", "success": False, "target": "out-of-bounds"})
@@ -96,9 +96,8 @@ class Agent:
 
         return action_result, reward
 
-
     def _handle_event_zone(self, new_pos, zone_type, action_result):
-        """Handle actions when the drone enters an event zone (e.g., obstacle, no-fly-zone)."""
+        """Handle actions when the drone enters an event zone."""
         action_result.update({"type": zone_type, "success": True, "target": zone_type})
 
     def _handle_pickup(self, new_pos, action_result):
