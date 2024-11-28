@@ -40,15 +40,22 @@ class InputHandler:
             mode: The input mode ("manual" for user input, "agent" for automated input).
             agent_action: The action determined by the agent (only used in "agent" mode).
         Returns:
-            A flag indicating whether the program should continue running.
+            The action string (e.g., "UP", "DOWN") or None if no action was taken.
         """
-        running = True
         if mode == "manual":
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
-                self.handle_manual_input(event)
+                    return None  # Signal to stop
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        return "UP"
+                    elif event.key == pygame.K_DOWN:
+                        return "DOWN"
+                    elif event.key == pygame.K_LEFT:
+                        return "LEFT"
+                    elif event.key == pygame.K_RIGHT:
+                        return "RIGHT"
         elif mode == "agent" and agent_action:
-            self.handle_agent_input(agent_action)
+            return agent_action
 
-        return running
+        return None  # No action performed
