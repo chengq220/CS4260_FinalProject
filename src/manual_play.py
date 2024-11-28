@@ -41,7 +41,12 @@ class ManualPlay:
         running = True
 
         while running:
-            running = self.input_handler.get_next_action(mode=mode, agent_action=agent_action)
+            action_taken = self.input_handler.get_next_action(mode=mode, agent_action=agent_action)
+
+            if action_taken:  # Only process if a valid action is taken
+                _, reward = self.agent.perform_action(action_taken)
+                print(f"Current Total Reward: {self.agent.reward_function.total_reward}")
+
             self.agent.render_environment()
 
             if self.agent.check_completion():
@@ -50,6 +55,7 @@ class ManualPlay:
 
             self.clock.tick(10)
 
+        print(f"Final Total Reward: {self.agent.reward_function.total_reward}")
         pygame.quit()
 
 
