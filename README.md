@@ -2,7 +2,7 @@
 
 To test the environment:
 * pip install all libraries in requirements.txt
-* Run environment.py
+* Run manual_play.py
 * Use arrow keys to move drone
 
 To use map editor:
@@ -21,3 +21,6 @@ To use map editor:
   * Use 's' to save the map. The map will be saved with the configurations for those pick-up and drop-off tiles.
   * Move the file to configs/ and modify the environment.py to use that pattern.
 * Make sure that the map is blank before switching modes.
+
+To test simple agent which only moves to pickup/dropoff and ignores zones:
+* Run bad_agent.py
