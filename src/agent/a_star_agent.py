@@ -3,10 +3,32 @@ from agent import Agent
 import heapq
 from simulation.environment import Environment
 
+pygame.init()
+
+# Constants
+WINDOW_SIZE = 600
+GRID_SIZE = 20
+CELL_SIZE = WINDOW_SIZE // GRID_SIZE
+TIME_STEP = 10  # Each drone move advances time by 10 minutes
+ZONE_CHANGE_INTERVAL = 120  # Zones change every 2 hours (120 minutes)
+
+# Colors
+COLORS = {
+    "WHITE": (255, 255, 255),
+    "BLACK": (0, 0, 0),
+    "GRAY": (200, 200, 200),
+    "RED": (255, 0, 0),
+    "BLUE": (0, 0, 255),
+    "GREEN": (0, 255, 0),
+    "YELLOW": (255, 255, 0),
+    "PURPLE": (128, 0, 128),
+    "ORANGE": (255, 165, 0),
+}
+
 class AStar(Agent):
-    def __init__(self, grid_size, cell_size, colors):
+    def __init__(self, grid_size = GRID_SIZE, cell_size = CELL_SIZE, colors = COLORS):
         # Base class initializer.
-        super().__init__(grid_size, cell_size, colors)
+        super().__init__(grid_size = GRID_SIZE, cell_size = CELL_SIZE, colors = COLORS)
 
     # Find path to next goal (pick-up/drop-off). Return computed path, or None if no goal
     # available.
@@ -30,7 +52,7 @@ class AStar(Agent):
             return None
         
         # Use A* to calculate the path to the goal
-        path = self.a_star_algorithm(self.environmenet.drone_pos, goal)
+        path = self.a_star_algorithm(self.environment.drone_pos, goal)
         return path
 
     # Get the closest pick-up point.
@@ -128,6 +150,7 @@ class AStar(Agent):
             path.append(current)
             current = came_from[current]
         path.reverse()
+        print(path)
         return path
     
     # Follow the calculated path step by step.
@@ -140,6 +163,7 @@ class AStar(Agent):
                 "DOWN" if dy == 1 else
                 "UP"
             )
+        pygame.time.wait(100)  # Add delay for visualization
         self.perform_action(action)
         self.render_environment()
 
@@ -148,4 +172,11 @@ class AStar(Agent):
         self.environment.reset()
         self.reward_function.reset()
         self.locations_manager.reset()
-        
+        next_objective = self.find_path_to_next_goal()
+        while next_objective != None:
+            self.follow_path(next_objective)
+
+if __name__ == "__main__":
+    game = AStar()
+    game.run()
+    pygame.quit()
