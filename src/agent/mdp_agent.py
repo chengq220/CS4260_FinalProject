@@ -159,10 +159,8 @@ class MDP_AGENT:
         """Move step by step to the target position."""
         path = []
         while current_pos != target_pos:
-            # print(current_pos)
             action = self.select_best_action(current_pos)
             current_pos = self.get_transition(current_pos, action)
-            # print(current_pos)
 
             path.append(current_pos)
             # Move drone position and calculate rewards
