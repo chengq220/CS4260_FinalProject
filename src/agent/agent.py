@@ -1,8 +1,8 @@
-from src.simulation.environment import Environment
-from src.simulation.event_simulator import EventSimulator
-from src.simulation.locations_manager import LocationsManager
-from src.simulation.render import Renderer
-from src.utils.reward_function import RewardFunction
+from simulation.environment import Environment
+from simulation.event_simulator import EventSimulator
+from simulation.locations_manager import LocationsManager
+from simulation.render import Renderer
+from utils.reward_function import RewardFunction
 
 
 class Agent:
