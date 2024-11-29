@@ -125,7 +125,21 @@ class MDP_AGENT:
                     self.util[state] = bestUtil
                     max_change = max(max_change, abs(self.util[state] - util_pre[state]))
 
-    
+    def select_best_action(self, current_pos):
+        """Select the best action based on utility values."""
+        actions = self.get_avail_action(current_pos) 
+        best_action = None
+        best_utility = float('-inf') 
+
+        for action in actions:
+            next_state = self.get_transition(current_pos, action)  
+            utility = self.util[next_state] 
+            if utility > best_utility:
+                best_utility = utility
+                best_action = action
+
+        return best_action
+
     def find_closest(self, current_pos, points):
         """Find the closest point to the current position."""
         return min(points, key=lambda p: abs(p[0] - current_pos[0]) + abs(p[1] - current_pos[1]))
@@ -134,15 +148,10 @@ class MDP_AGENT:
         """Move step by step to the target position."""
         path = []
         while current_pos != target_pos:
-            actions = self.get_avail_action(current_pos)
-            bestState = current_pos
-            bestUtil = float('-inf')
-            for act in actions:
-                nextState = self.get_transition(current_pos, act)
-                if(self.util[nextState] > bestUtil):
-                    bestUtil = self.util[nextState]
-                    bestState = nextState
-            current_pos = bestState
+            # print(current_pos)
+            action = self.select_best_action(current_pos)
+            current_pos = self.get_transition(current_pos, action)
+            # print(current_pos)
 
             path.append(current_pos)
             # Move drone position and calculate rewards
@@ -183,8 +192,6 @@ class MDP_AGENT:
         self.locations_manager.reset()
         pick_up_ppoints = self.locations_manager.get_pick_up_points().copy()
         drop_off_ppoints = self.locations_manager.get_drop_off_points().copy()
-        print(pick_up_ppoints)
-        print(drop_off_ppoints)
 
         while self.locations_manager.get_pick_up_points():
             current_pos = self.environment.drone_pos
@@ -196,6 +203,8 @@ class MDP_AGENT:
             task_id = self.locations_manager.get_pick_up_points()[closest_pickup]
             self._init_util() #compute the the utility for the picking for specific task_id
             self.value_iter()
+            # print(self.util)
+            # exit()
             self.pick_up = next(key for key, value in pick_up_ppoints.items() if value == task_id)
 
             # Move to the pick-up point
