@@ -5,9 +5,10 @@
         {"pick_up": [5, 5], "drop_off": [18, 18], "id": 3}
     ],
     "deliveries2": [
-        {"pick_up": [7, 7], "drop_off": [10, 10], "id": 1},
-        {"pick_up": [3, 3], "drop_off": [15, 15], "id": 2},
-        {"pick_up": [5, 5], "drop_off": [18, 18], "id": 3}
+        {"pick_up": [4, 3], "drop_off": [3, 8], "id": 1},
+        {"pick_up": [3, 3], "drop_off": [2, 6], "id": 2},
+        {"pick_up": [5, 5], "drop_off": [6, 8], "id": 3},
+        {"pick_up": [7, 7], "drop_off": [10, 10], "id": 4}
     ],
     "deliveries3": [
         {"pick_up": [1, 1], "drop_off": [10, 10], "id": 1},
