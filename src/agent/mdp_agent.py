@@ -184,6 +184,10 @@ class MDP_AGENT:
             # Update time and dynamic events
             self.environment.advance_time()
             self.environment.update_dynamic_events()  # Ensure dynamic zones are updated
+            #need to recopute the utilitiy
+            self._init_util()
+            self.value_iter()
+
 
             if self.render:
                 self.renderer.render(
@@ -201,7 +205,7 @@ class MDP_AGENT:
         self.environment.reset()
         self.reward_function.reset()
         self.locations_manager.reset()
-        self.environment.update_dynamic_events() #make sure all the obstacles are updated 
+        # self.environment.update_dynamic_events() #make sure all the obstacles are updated 
 
         while self.locations_manager.get_pick_up_points():
             current_pos = self.environment.drone_pos
