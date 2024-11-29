@@ -85,18 +85,29 @@ class MDP_AGENT:
         noflyzone = self.environment.no_fly_zones
         obstacles = self.environment.obstacles
         reward = 0
-
         if(state in noflyzone):
             reward = -20
         elif(state in obstacles):
             reward = -10
         elif(state == self.drop_off):
-            reward = 30 if hasPackage else -1
+            reward = 30 if hasPackage else 0
         elif(state == self.pick_up):
-            reward = -1 if hasPackage else 30
+            reward = 0 if hasPackage else 30
         else:
-            reward = -1
+            reward = self.distance(state, hasPackage)
         return reward
+
+    def distance(self, state, hasPackage):
+        """The reward for neutral tiles will be based on the distance from the objective"""
+        target = self.drop_off if hasPackage else self.pick_up
+        x,y = target
+        state_x, state_y = state
+        
+        manhattan_dist = abs(x - state_x) + abs(y - state_y)
+        
+        reward = max(1, 25 - 0.5 * manhattan_dist)
+        
+        return reward 
 
     def value_iter(self):
         """Value iteration to get the utility for the map"""
@@ -186,45 +197,44 @@ class MDP_AGENT:
         return path
 
     def run(self):
-        """Run the mdp agent to complete all deliveries."""
+        """Run the bad agent to complete all deliveries."""
         self.environment.reset()
         self.reward_function.reset()
         self.locations_manager.reset()
-        pick_up_ppoints = self.locations_manager.get_pick_up_points().copy()
-        drop_off_ppoints = self.locations_manager.get_drop_off_points().copy()
+        self.environment.update_dynamic_events() #make sure all the obstacles are updated 
 
         while self.locations_manager.get_pick_up_points():
             current_pos = self.environment.drone_pos
             pick_up_points = list(self.locations_manager.get_pick_up_points().keys())
             drop_off_points = {v: k for k, v in self.locations_manager.get_drop_off_points().items()}
+            pick_up_ppoints = self.locations_manager.get_pick_up_points().copy()
+            drop_off_ppoints = self.locations_manager.get_drop_off_points().copy()
 
             # Find the closest pick-up point
             closest_pickup = self.find_closest(current_pos, pick_up_points)
-            task_id = self.locations_manager.get_pick_up_points()[closest_pickup]
-            self._init_util() #compute the the utility for the picking for specific task_id
-            self.value_iter()
-            # print(self.util)
-            # exit()
-            self.pick_up = next(key for key, value in pick_up_ppoints.items() if value == task_id)
 
             # Move to the pick-up point
             print(f"Heading to pick-up point: {closest_pickup}")
+            task_id = self.locations_manager.get_pick_up_points()[closest_pickup]
+            self._init_util() #compute the the utility for the picking for specific task_id
+            self.pick_up = next(key for key, value in pick_up_ppoints.items() if value == task_id)
+            self.value_iter()
             self.move_to_target(current_pos, closest_pickup)
 
             # Perform pick-up
             self.environment.is_carrying_package = True
-            
+            task_id = self.locations_manager.get_pick_up_points()[closest_pickup]
             self.locations_manager.pick_up_points.pop(closest_pickup)
             reward = self.reward_function.calculate_reward(
                 closest_pickup, self.environment, {"type": "pick-up", "success": True}
             )
             print(f"Picked up package {task_id} at {closest_pickup}, Current Total Reward: {self.reward_function.total_reward}")
 
+            # Move to the corresponding drop-off point
+            drop_off_pos = drop_off_points[task_id]
             self._init_util() #recompute the utility for the dropoff for specific task_id
             self.drop_off = next(key for key, value in drop_off_ppoints.items() if value == task_id)
             self.value_iter()
-            # Move to the corresponding drop-off point
-            drop_off_pos = drop_off_points[task_id]
             print(f"Heading to drop-off point: {drop_off_pos}")
             self.move_to_target(self.environment.drone_pos, drop_off_pos)
 
@@ -238,6 +248,7 @@ class MDP_AGENT:
 
         print("All deliveries completed!")
         print(f"Final Total Reward: {self.reward_function.total_reward}")
+
 
 
 if __name__ == "__main__":
