@@ -185,8 +185,9 @@ class MDP_AGENT:
             self.environment.advance_time()
             self.environment.update_dynamic_events()  # Ensure dynamic zones are updated
             #need to recopute the utilitiy
-            self._init_util()
-            self.value_iter()
+            if self.environment.event_simulator:
+                self._init_util()
+                self.value_iter()
 
 
             if self.render:
