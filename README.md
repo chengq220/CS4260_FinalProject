@@ -24,3 +24,8 @@ To use map editor:
 
 To test simple agent which only moves to pickup/dropoff and ignores zones:
 * Run bad_agent.py
+* To Avoid the src module not found error, Run the following command from base directory
+```
+python -m src.agent.mdp_agent
+python -m src.agent.bad_agent
+```
