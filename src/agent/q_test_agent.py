@@ -35,7 +35,7 @@ class QLearningTester:
         self.event_simulator = EventSimulator(grid_size=GRID_SIZE, config_path="src/configs/event_patterns.json")
         self.environment.set_event_simulator(self.event_simulator)
 
-        self.locations_manager = LocationsManager(config_path="src/configs/pick_up_drop_off_config.json")
+        self.locations_manager = LocationsManager(config_path="q_learning_config.json")
         self.environment.set_locations_manager(self.locations_manager)
 
         self.reward_function = RewardFunction()

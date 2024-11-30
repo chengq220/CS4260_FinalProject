@@ -39,6 +39,3 @@ To test agents, use the following command on the desired agent in the `src/agent
 python -m src.agent.bad_agent
 ```
 **Note: To Avoid the src module not found error, Run the following command from base directory**
-
-Q-learning:
-Q-learning agent is trained on a different map. Change the "deliveries" variable in simulation/locations_manager.py from "deliveries1" to "deliveries3" and then run q_test_agent.py

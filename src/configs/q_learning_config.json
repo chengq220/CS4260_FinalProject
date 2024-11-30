@@ -1,0 +1,8 @@
+{
+    "deliveries1": [
+        {"pick_up": [3, 3], "drop_off": [4, 3], "id": 1},
+        {"pick_up": [2, 6], "drop_off": [3, 8], "id": 2},
+        {"pick_up": [5, 5], "drop_off": [6, 8], "id": 3},
+        {"pick_up": [7, 7], "drop_off": [9, 8], "id": 4}
+    ]
+}
