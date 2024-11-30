@@ -11,6 +11,10 @@ GRID_SIZE = 20
 CELL_SIZE = WINDOW_SIZE // GRID_SIZE
 TIME_STEP = 10  # Each drone move advances time by 10 minutes
 ZONE_CHANGE_INTERVAL = 120  # Zones change every 2 hours (120 minutes)
+STEPS_BEFORE_RECALCULATE = 12 # Moves this many times along the ideal path until recalculating.
+
+# Global variable to keep track of the steps.
+count = 0
 
 # Colors
 COLORS = {
@@ -62,7 +66,7 @@ class AStar(Agent):
     
     # Get the closest drop-off point matching given package ID.
     def get_closest_drop_off_point(self, package_id):
-        drop_off_points = self.locations_manger.get_drop_off_points()
+        drop_off_points = self.locations_manager.get_drop_off_points()
         valid_drop_offs = {point: id for point, id in drop_off_points.items() if id == package_id}
 
         return self.get_closest_point(self.environment.drone_pos, valid_drop_offs)
@@ -104,7 +108,6 @@ class AStar(Agent):
                 # Might have to modify this part if restricted zone.
                 movement_cost = self.get_movement_cost(neighbor)
                 tentative_g_score = g_score[current] + movement_cost
-
                 if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
                     came_from[neighbor] = current
                     g_score[neighbor] = tentative_g_score
@@ -127,11 +130,12 @@ class AStar(Agent):
         directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
         neighbors = []
         for dx, dy in directions:
-            neighbor = (x + dy, y + dy)
+            neighbor = (x + dx, y + dy)
             if 0 <= neighbor[0] < self.environment.grid_size and 0 <= neighbor[1] < self.environment.grid_size:
                 neighbors.append(neighbor)
         return neighbors
-    
+    # VERY IMPORTANT. THE IDEAL PATH IT CALCULATES IS CURRENTLY FUNCTIONING ON AT THE TIME.
+    # CONSIDER RECALCULATING AFTER 12 MOVES.
     def get_movement_cost(self, position):
         # No-fly zone.
         if position in self.environment.obstacles:
@@ -150,11 +154,11 @@ class AStar(Agent):
             path.append(current)
             current = came_from[current]
         path.reverse()
-        print(path)
         return path
     
     # Follow the calculated path step by step.
     def follow_path(self, path):
+        global count
         for step in path:
             dx, dy = step[0] - self.environment.drone_pos[0], step[1] - self.environment.drone_pos[1]
             action = (
@@ -163,9 +167,13 @@ class AStar(Agent):
                 "DOWN" if dy == 1 else
                 "UP"
             )
-        pygame.time.wait(100)  # Add delay for visualization
-        self.perform_action(action)
-        self.render_environment()
+            pygame.time.wait(100)  # Add delay for visualization
+            self.perform_action(action)
+            self.render_environment()
+            count += 1
+            if count >= STEPS_BEFORE_RECALCULATE:
+                count = 0
+                break
 
     def run(self):
         # Run the A* agent to complete all deliveries.
@@ -175,8 +183,11 @@ class AStar(Agent):
         next_objective = self.find_path_to_next_goal()
         while next_objective != None:
             self.follow_path(next_objective)
+            next_objective = self.find_path_to_next_goal()
+
 
 if __name__ == "__main__":
     game = AStar()
     game.run()
+    print("Total reward: ", game.reward_function.total_reward)
     pygame.quit()
