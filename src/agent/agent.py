@@ -91,7 +91,7 @@ class Agent:
         reward = self.reward_function.calculate_reward(
             new_pos, self.environment, action_result
         )
-        print(f"Action: {action_result}, Reward: {reward}")
+        # print(f"Action: {action_result}, Reward: {reward}")
         self.environment.advance_time()
 
         return action_result, reward

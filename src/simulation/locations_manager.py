@@ -1,6 +1,9 @@
 import json
 import os
 
+# deliveries config key
+deliveries = "deliveries1"
+
 class LocationsManager:
     def __init__(self, config_path="pick_up_drop_off_config.json"):
         """
@@ -10,7 +13,7 @@ class LocationsManager:
         """
         config_path = os.path.join(os.path.dirname(__file__), "../configs", os.path.basename(config_path))
         with open(config_path, "r") as file:
-            self.delivery_tasks = json.load(file).get("deliveries1", [])
+            self.delivery_tasks = json.load(file).get(deliveries, [])
 
         self.pick_up_points = {tuple(task["pick_up"]): task["id"] for task in self.delivery_tasks}
         self.drop_off_points = {tuple(task["drop_off"]): task["id"] for task in self.delivery_tasks}

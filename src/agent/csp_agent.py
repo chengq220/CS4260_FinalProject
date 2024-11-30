@@ -147,11 +147,11 @@ class CSPAgent:
                     drop_off_points=self.locations_manager.get_drop_off_points()
                 )
                 pygame.time.wait(100)  # Add delay for visualization
-            print(f"Moved to {current_pos}, Current Total Reward: {self.reward_function.total_reward}")
+            # print(f"Moved to {current_pos}, Current Total Reward: {self.reward_function.total_reward}")
 
         # Retry if the path becomes blocked
         if self.environment.drone_pos != target:
-            print(f"Path blocked. Waiting or recalculating path to {target}...")
+            # print(f"Path blocked. Waiting or recalculating path to {target}...")
             return False  # Indicate failure to reach target
         return True  # Successfully reached target
 
@@ -177,7 +177,6 @@ class CSPAgent:
                 if not path_to_pickup:
                     self.environment.advance_time()
                     self.environment.update_dynamic_events()
-                    print("No path available. Waiting...")
                 else:
                     success = self.move_to_target(path_to_pickup, closest_pickup)
 
@@ -188,18 +187,15 @@ class CSPAgent:
             reward = self.reward_function.calculate_reward(
                 closest_pickup, self.environment, {"type": "pick-up", "success": True}
             )
-            print(f"Picked up package {task_id} at {closest_pickup}, Current Total Reward: {self.reward_function.total_reward}")
 
             # Keep trying to reach the drop-off point
             drop_off_pos = drop_off_points[task_id]
-            print(f"Heading to drop-off point: {drop_off_pos}")
             success = False
             while not success:
                 path_to_dropoff = self.find_path(self.environment.drone_pos, drop_off_pos)
                 if not path_to_dropoff:
                     self.environment.advance_time()
                     self.environment.update_dynamic_events()
-                    print("No path available. Waiting...")
                 else:
                     success = self.move_to_target(path_to_dropoff, drop_off_pos)
 
