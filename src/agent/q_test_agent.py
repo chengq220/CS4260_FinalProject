@@ -1,5 +1,6 @@
 import pygame
 import pickle
+import os
 from src.simulation.environment import Environment
 from src.simulation.event_simulator import EventSimulator
 from src.simulation.locations_manager import LocationsManager
@@ -41,7 +42,8 @@ class QLearningTester:
         self.renderer = Renderer(grid_size=GRID_SIZE, cell_size=CELL_SIZE, colors=COLORS, window_size=WINDOW_SIZE)
 
         # Load the Q-table from a file
-        with open(Q_TABLE_FILE, "rb") as f:
+        q_table_path = os.path.join(os.path.dirname(__file__), "../agent", os.path.basename(Q_TABLE_FILE))
+        with open(q_table_path, "rb") as f:
             self.q_table = pickle.load(f)
 
     def choose_action(self, state, last_action=None):
