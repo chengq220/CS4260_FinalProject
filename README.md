@@ -35,6 +35,7 @@ Once the environment appears, use the arrow keys to move the drone.
 
 ### Running Agents for Automatic Solving 
 To test agents, use the following command on the desired agent in the `src/agent/` folder. 
+
 **Note: To Avoid the src module not found error, run the following command from the base directory**
 ```
 python -m src.agent.bad_agent
