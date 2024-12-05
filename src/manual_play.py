@@ -1,6 +1,6 @@
 import pygame
 from agent.agent import Agent
-from src.agent.input_handler import InputHandler
+from agent.input_handler import InputHandler
 
 pygame.init()
 
