@@ -26,7 +26,7 @@ New maps can be created using ```map_editor.py```. To create a new map, follow t
 **Note: Make sure that the map is blank before switching modes.**
 
 ### Testing Environment
-To test the environment or to play the game manually, run the following code:
+To test the environment or to play the game manually, run the following command from the base directory:
 ```
 python src/manual_play.py
 ```
