@@ -38,5 +38,9 @@ To test agents, use the following command on the desired agent in the `src/agent
 
 **Note: To Avoid the src module not found error, run the following command from the base directory**
 ```
-python -m src.agent.bad_agent
+python -m src.agent.<agent name>
+```
+For example, if you want to run the A* agent, run the following command from the base directory:
+```
+python -m src.agent.a_star_agent
 ```
