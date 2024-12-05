@@ -28,7 +28,7 @@ New maps can be created using ```map_editor.py```. To create a new map, follow t
 ### Testing Environment
 To test the environment or to play the game manually, run the following code:
 ```
-python manual_play.py
+python src/manual_play.py
 ```
 
 Once the environment appears, use the arrow keys to move the drone. 
